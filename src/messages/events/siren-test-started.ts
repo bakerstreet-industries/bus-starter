@@ -1,9 +1,9 @@
 import { Event } from '@node-ts/bus-messages'
-import { Uuid } from './uuid'
+import { Uuid } from '../uuid'
 
 export class SirenTestStarted extends Event {
 
-  static readonly NAME = 'bus-started/siren-test-started'
+  static readonly NAME = 'bus-starter/siren-test-started'
   readonly $name = SirenTestStarted.NAME
   readonly $version = 0
 

@@ -1,9 +1,9 @@
 import { Command } from '@node-ts/bus-messages'
-import { Uuid } from './uuid'
+import { Uuid } from '../uuid'
 
 export class StartSirenTest extends Command {
 
-  static readonly NAME = 'bus-started/start-siren-test'
+  static readonly NAME = 'bus-starter/start-siren-test'
   readonly $name = StartSirenTest.NAME
   readonly $version = 0
 

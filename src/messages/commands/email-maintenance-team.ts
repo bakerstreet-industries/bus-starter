@@ -1,5 +1,5 @@
 import { Command } from '@node-ts/bus-messages'
-import { Uuid } from './uuid'
+import { Uuid } from '../uuid'
 
 export class EmailMaintenanceTeam extends Command {
 
