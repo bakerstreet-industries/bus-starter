@@ -1,26 +1,17 @@
-import { BusInstance, Workflow, WorkflowMapper } from "@node-ts/bus-core";
-import { inject, injectable } from "inversify";
+import { SirenTestWorkflowData } from './siren-test-workflow-data'
 import {
-  EmailMaintenanceTeam,
-  MaintenanceTeamEmailed,
+  SirenTestStarted,
   SirenTestFailed,
   SirenTestPassed,
-  SirenTestStarted,
-} from "../messages";
-import { SirenTestWorkflowData } from "./sirent-test-workflow-data";
+  EmailMaintenanceTeam,
+  MaintenanceTeamEmailed
+} from '../messages'
+import { Workflow, WorkflowMapper } from '@node-ts/bus-core'
+import { bus } from '../bus'
 
-@injectable()
 export class SirenTestWorkflow extends Workflow<SirenTestWorkflowData> {
-  constructor(
-    @inject("bus")
-    private readonly bus: BusInstance
-  ) {
-    super();
-  }
 
-  configureWorkflow(
-    mapper: WorkflowMapper<SirenTestWorkflowData, SirenTestWorkflow>
-  ) {
+  configureWorkflow (mapper: WorkflowMapper<SirenTestWorkflowData, SirenTestWorkflow>) {
     mapper
       .withState(SirenTestWorkflowData)
       .startedBy(SirenTestStarted, "handlesSirenTestStarted")
@@ -54,9 +45,9 @@ export class SirenTestWorkflow extends Workflow<SirenTestWorkflowData> {
     const emailMaintenanceTeam = new EmailMaintenanceTeam(
       "A siren has failed its test and requires maintenance",
       sirenId
-    );
-    await this.bus.send(emailMaintenanceTeam);
-    return {};
+    )
+    await bus().send(emailMaintenanceTeam)
+    return {}
   }
 
   async handlesSirenTestPassed(
