@@ -29,6 +29,15 @@ export class SirenTestWorkflow extends Workflow<SirenTestWorkflowData> {
       });
   }
 
+  handleRussTest({
+    sirenId,
+  }: SirenTestStarted): Partial<SirenTestWorkflowData> {
+    console.log("workflow::handlesSirenTestStarted");
+    return {
+      sirenId,
+    };
+  }
+
   handlesSirenTestStarted({
     sirenId,
   }: SirenTestStarted): Partial<SirenTestWorkflowData> {
