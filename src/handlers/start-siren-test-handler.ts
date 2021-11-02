@@ -15,6 +15,15 @@ export const startSirenTestHandler = handlerFor(
   }
 )
 
+export const startSirenTestHandler1 = handlerFor(
+  StartSirenTest,
+  async ({ sirenId }) => {
+    console.log('StartSirenTest13123 command received, starting siren test...', { sirenId })
+    setTimeout(async () => testSiren(bus(), sirenId), MAX_SIREN_TEST_DURATION)
+    await bus().publish(new SirenTestStarted(sirenId))
+  }
+)
+
 async function testSiren (bus: BusInstance, sirenId: Uuid): Promise<void> {
   const testFailed = Math.random() > TEST_FAILURE_THRESHOLD
   console.log('Siren test completed, publishing event', { sirenId, testFailed })

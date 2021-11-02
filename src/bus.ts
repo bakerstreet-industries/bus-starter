@@ -1,8 +1,8 @@
-import { startSirenTestHandler, emailMaintenanceTeamHandler } from './handlers'
+import { startSirenTestHandler, emailMaintenanceTeamHandler, startSirenTestHandler1 } from './handlers'
 import { SirenTestWorkflow } from './workflows'
 import { RabbitMqTransportConfiguration, RabbitMqTransport } from '@node-ts/bus-rabbitmq'
 import { explainInitializationError } from './error-helpers'
-import { Bus, BusInstance } from '@node-ts/bus-core'
+import { Bus, BusConfiguration, BusInstance } from '@node-ts/bus-core'
 
 const rabbitMqConfiguration: RabbitMqTransportConfiguration = {
   queueName: '@node-ts/bus-starter-test',
@@ -22,19 +22,21 @@ export const initializeBus = async (): Promise<void> => {
     throw new Error('Bus has already been initialized')
   }
 
+  let bc;
   try {
-    busInstance = await Bus.configure()
+    bc = Bus.configure()
       .withWorkflow(SirenTestWorkflow)
       .withHandler(startSirenTestHandler)
       .withHandler(emailMaintenanceTeamHandler)
-      .withTransport(rabbitMq)
-      .initialize()
+      .withTransport(rabbitMq);
+      busInstance = await bc.initialize();
   } catch (error) {
     explainInitializationError(error)
     throw error
   }
 
   await busInstance.start()
+  bc.withHandler(startSirenTestHandler1);
 }
 
 /**
