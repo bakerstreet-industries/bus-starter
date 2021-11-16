@@ -3,6 +3,7 @@ import { SirenTestWorkflow } from './workflows'
 import { RabbitMqTransportConfiguration, RabbitMqTransport } from '@node-ts/bus-rabbitmq'
 import { explainInitializationError } from './error-helpers'
 import { Bus, BusInstance } from '@node-ts/bus-core'
+import { dummyErrorHandler } from 'handlers/dummy-error-handler'
 
 const rabbitMqConfiguration: RabbitMqTransportConfiguration = {
   queueName: '@node-ts/bus-starter-test',
@@ -27,7 +28,8 @@ export const initializeBus = async (): Promise<void> => {
       .withWorkflow(SirenTestWorkflow)
       .withHandler(startSirenTestHandler)
       .withHandler(emailMaintenanceTeamHandler)
-      .withTransport(rabbitMq)
+      .withHandler(dummyErrorHandler)
+      // .withTransport(rabbitMq)
       .initialize()
   } catch (error) {
     explainInitializationError(error)
