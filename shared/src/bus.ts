@@ -1,32 +1,50 @@
-import { Bus, BusInstance } from "@node-ts/bus-core";
+import {
+  Bus,
+  BusInstance,
+  ClassConstructor,
+  HandlerDefinition,
+} from "@node-ts/bus-core";
+import {
+  Message,
+  MessageAttributeMap,
+  MessageAttributes,
+} from "@node-ts/bus-messages";
 import {
   RabbitMqTransport,
   RabbitMqTransportConfiguration,
 } from "@node-ts/bus-rabbitmq";
-import { handler2 } from "handlers/handler-2";
 import { explainInitializationError } from "./error-helpers";
 
-const rabbitMqConfiguration: RabbitMqTransportConfiguration = {
-  queueName: "@node-ts/bus-2",
-  connectionString: "amqp://guest:guest@0.0.0.0",
-  maxRetries: 10,
-};
-
-const rabbitMq = new RabbitMqTransport(rabbitMqConfiguration);
 
 let busInstance: BusInstance | undefined;
 
 /**
  * Initializes a new instance of bus
  */
-export const initializeBus = async (): Promise<void> => {
+export const initializeBus = async (
+  queueName: string,
+  handler: {
+    messageType: ClassConstructor<Message>;
+    messageHandler: HandlerDefinition<
+      Message,
+      MessageAttributes<MessageAttributeMap, MessageAttributeMap>
+    >;
+  }
+): Promise<void> => {
   if (!!busInstance) {
     throw new Error("Bus has already been initialized");
   }
-
+  const rabbitMqConfiguration: RabbitMqTransportConfiguration = {
+    queueName,
+    connectionString: "amqp://guest:guest@rabbitmq",
+    maxRetries: 2,
+  };
+  
+  const rabbitMq = new RabbitMqTransport(rabbitMqConfiguration);
+  
   try {
     busInstance = await Bus.configure()
-      .withHandler(handler2)
+      .withHandler(handler)
       .withTransport(rabbitMq)
       .initialize();
   } catch (error) {

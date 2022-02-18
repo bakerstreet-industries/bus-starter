@@ -1,21 +1,66 @@
-version: '3.7'
+version: "3.7"
 
 services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: 'rabbitmq'
+    container_name: "rabbitmq"
     environment:
       - RABBITMQ_USER=user
       - RABBITMQ_PASSWORD=pass
     ports:
-        - 5672:5672
-        - 15672:15672
+      - 5672:5672
+      - 15672:15672
     volumes:
-        - .docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-        - .docker-conf/rabbitmq/log/:/var/log/rabbitmq
+      - .docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - .docker-conf/rabbitmq/log/:/var/log/rabbitmq
     networks:
-        - rabbitmq_network
+      - backend
 
+  app1:
+    build:
+      context: ./app1
+      target: development-stage
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./app1:/app1
+      - ./shared:/shared
+      - ./tsconfig.json:/tsconfig.json
+      - ./node_modules:/node_modules
+    restart: "unless-stopped"
+    networks:
+      - backend
+    depends_on:
+      - rabbitmq
+  app2:
+    build:
+      context: ./app2
+      target: development-stage
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./app2:/app2
+      - ./shared:/shared
+      - ./tsconfig.json:/tsconfig.json
+      - ./node_modules:/node_modules
+    restart: "unless-stopped"
+    networks:
+      - backend
+    depends_on:
+      - rabbitmq
+  app3:
+    build:
+      context: ./app3
+      target: development-stage
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./app3:/app3
+      - ./shared:/shared
+      - ./tsconfig.json:/tsconfig.json
+      - ./node_modules:/node_modules
+    restart: "unless-stopped"
+    networks:
+      - backend
+    depends_on:
+      - rabbitmq
 networks:
-  rabbitmq_network:
+  backend:
     driver: bridge
